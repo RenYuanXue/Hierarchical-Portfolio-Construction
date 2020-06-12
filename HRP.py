@@ -1,5 +1,6 @@
 # Standard imports.
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from scipy import stats
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -101,8 +102,10 @@ class HierarchicalRiskParity():
         serial_matrix[b, a] = serial_matrix[a, b]
         return serial_matrix, order
 
-    def stageThree(self, covariances, order):
-        weights = np.ones((1, len(order)))
+    def stageThree(self, covariance, order):
+        covariance = np.array(covariance)
+        weights = np.ones((1,len(order)))
+        # weights = pd.Series(1, index=order)
         clustered_alphas = [order]
 
         while len(clustered_alphas) > 0:
@@ -116,20 +119,23 @@ class HierarchicalRiskParity():
                 left_cluster = clustered_alphas[subcluster]
                 right_cluster = clustered_alphas[subcluster + 1]
 
-                left_subcovar = covariances[left_cluster].loc[left_cluster]
-                inv_diag = 1 / np.diag(left_subcovar.values)
+                left_subcovar = covariance[np.ix_(left_cluster, left_cluster)]
+                inv_diag = 1 / np.diag(left_subcovar)
                 parity_w = inv_diag * (1 / np.sum(inv_diag))
                 left_cluster_var = np.dot(parity_w, np.dot(left_subcovar, parity_w))
 
-                right_subcovar = covariances[right_cluster].loc[right_cluster]
-                inv_diag = 1 / np.diag(right_subcovar.values)
+                right_subcovar = covariance[np.ix_(right_cluster, right_cluster)]
+                inv_diag = 1 / np.diag(right_subcovar)
                 parity_w = inv_diag * (1 / np.sum(inv_diag))
                 right_cluster_var = np.dot(parity_w, np.dot(right_subcovar, parity_w))
 
                 alloc_factor = 1 - left_cluster_var / (left_cluster_var + right_cluster_var)
 
-                weights[left_cluster] *= alloc_factor
-                weights[right_cluster] *= 1 - alloc_factor
+                weights[np.ix_([0],left_cluster)] *= alloc_factor
+                weights[np.ix_([0],right_cluster)] *= 1 - alloc_factor
+
+                # weights[left_cluster] *= alloc_factor
+                # weights[right_cluster] *= 1 - alloc_factor
                 
         return weights
 
@@ -139,13 +145,7 @@ class HierarchicalRiskParity():
         plt.show()
 
 def main():
-    x = [[i] for i in [2,8,0,4,1,9,9,0]]
-    link = linkage(x, 'ward')
-    print(x)
-    print(link)
-    fig = plt.figure(figsize = (10,4))
-    dn = dendrogram(link)
-    plt.show()
+    pass
 
 if __name__ == "__main__":
     main()
