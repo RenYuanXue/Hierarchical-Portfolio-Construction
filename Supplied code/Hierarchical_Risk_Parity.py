@@ -54,7 +54,7 @@ def findCovMat(x):
     '''
     # Turn the variable into ndarray in case it's not.
     x = np.array(x)
-    return np.cov(x)
+    return np.cov(np.transpose(x))
 
 def findCorrMat(x):
     '''
@@ -266,7 +266,7 @@ class HierarchicalRiskParity():
                 # weights[right_cluster] *= 1 - alloc_factor
         return weights
 
-    def getWeights(self, x, method = 'single', cov_method = ''):
+    def getWeights(self, x, cov_mat, method = 'single', cov_method = ''):
         '''
         weights = getWeights(x, method = 'single', cov_method = '')
 
@@ -290,6 +290,7 @@ class HierarchicalRiskParity():
         @return weights: ndarray
             portfolio weights for hierarachical risk parity method.
         '''
+        '''
         if cov_method == '':
             cov_mat = findCovMat(x)
         elif cov_method == 'SMPL':
@@ -298,6 +299,8 @@ class HierarchicalRiskParity():
             pass
         elif cov_method == 'DCCGARCH':
             pass
+        '''
+        
         corr_mat = findCorrMat(x)
         dist_mat = findDistMat(corr_mat)
         self.stageOne(dist_mat, method)
