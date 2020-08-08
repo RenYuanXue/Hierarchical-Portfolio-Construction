@@ -9,7 +9,7 @@ from Traditional_Methods import *
 from Hierarchical_Risk_Parity import *
 
 def generateData(nObs,sLength,size0,size1,mu0,sigma0,sigma1F):
-    np.random.seed(3)
+    np.random.seed(4)
     #1) generate random uncorrelated data
     x=np.random.normal(mu0,sigma0,size=(nObs,size0)) # each row is a variable 
     #2) create correlation between the variables 
@@ -18,13 +18,13 @@ def generateData(nObs,sLength,size0,size1,mu0,sigma0,sigma1F):
     x=np.append(x,y,axis=1) 
     #3) add common random shock
     point=np.random.randint(sLength,nObs-1,size=2) 
-    x[np.ix_(point,[cols[0],size0])]=np.array([[-.5,-.5],[2,2]]) 
+    x[np.ix_(point,[cols[0],size0])]=np.array([[-.5,-.5],[2,2]])
     #4) add specific random shock 
     point=np.random.randint(sLength,nObs-1,size=2) 
     x[point,cols[-1]]=np.array([-.5,2]) 
     return x
 
-def IVP(cov, **kargs):
+def IVarP(cov, **kargs):
     weights = inverseVarianceWeighted(cov)
     return weights
 
@@ -37,10 +37,14 @@ def MVP(cov, **kargs):
     weights = minimumVariance(cov)
     return weights
 
+def IVP(cov, **kargs):
+    weights = inverseVolatilityWeighted(cov)
+    return weights
+
 def main(numIters=1000,nObs=520,size0=5,size1=5,mu0=0,sigma0=1e-2, sigma1F=.25,sLength=260,rebal=22): 
     # Monte Carlo experiment on HRP
     count = 0 
-    methods=[IVP,HRP,MVP]
+    methods=[HRP,MVP,IVP, IVarP]
     stats={i.__name__:pd.Series(dtype='float64') for i in methods}
     pointers=range(sLength,nObs,rebal) 
     while count<numIters:
@@ -71,4 +75,4 @@ def main(numIters=1000,nObs=520,size0=5,size1=5,mu0=0,sigma0=1e-2, sigma1F=.25,s
     return 0
 
 if __name__ == '__main__':
-    main(numIters=1000,nObs=520,size0=5,size1=5,mu0=0,sigma0=1e-2, sigma1F=.25,sLength=260,rebal=22)
+    main(numIters=10000,nObs=520,size0=5,size1=5,mu0=0,sigma0=1e-2, sigma1F=.25,sLength=260,rebal=22)

@@ -1,6 +1,6 @@
 import setuptools
 
-with open("READ_package.md", "r") as fh:
+with open("READMe.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
