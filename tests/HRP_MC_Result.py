@@ -1,6 +1,6 @@
 # Standard codes.
 import sys
-sys.path.append("../Supplied code") # for finding the source files
+sys.path.append("..\Supplied-code") # for finding the source files
 import scipy.cluster.hierarchy as sch,random
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ from Traditional_Methods import *
 from Hierarchical_Risk_Parity import *
 
 def generateData(nObs,sLength,size0,size1,mu0,sigma0,sigma1F):
-    np.random.seed(4)
+    np.random.seed(59)
     #1) generate random uncorrelated data
     x=np.random.normal(mu0,sigma0,size=(nObs,size0)) # each row is a variable 
     #2) create correlation between the variables 
